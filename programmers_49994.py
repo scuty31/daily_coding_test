@@ -15,20 +15,18 @@
 """
 
 """
-맵의 크기를 0~10으로 맞춘다.
-캐릭터의 처음 위치를 (5, 5)로 지정한다.
-해당 위치에서 명령어대로 움직이게 한다.
-움직일 때마다 이동한 길을 표시한다.
-만약, 캐릭터가 이동했던 길을 한번 더 이동할 때는 count하지 않는다.
-
-총 visited의 개수를 4개를 만들어 해당 점에서 위, 아래, 오른쪽, 왼쪽으로 이동할 때마다 표시하도록 한다.
+캐릭터가 명령어를 수행할 때, 명령어를 수행하기 전의 좌표와 명령어를 수행한 후의 좌표를 기록한다.
+만약 명령어를 수행할 수 없으면 넘어간다.
+출발 좌표와 도착 좌표가 같다면 해당 길은 이미 걸어본 길이기 때문에 count를 하지 않는다.
 """
-def move(dirs, player, visited):
-    cnt = 0
-    d_dict = {"U": 0, "D": 1, "R": 2, "L": 3}       # 순서대로 위, 아래, 오른쪽, 왼쪽
-    dx = [-1, 1, 0, 0]
-    dy = [0, 0, 1, -1]
-    x, y = player
+
+def solution(dirs):
+    x, y = 0, 0     # 플레이어는 (0, 0)에 있다.
+    d_dict = {"U": 0, "R": 1, "D": 2, "L": 3}  # 순서대로 위, 오른쪽, 아래, 왼쪽
+    dx = [-1, 0, 1, 0]
+    dy = [0, 1, 0, -1]
+    visited = []
+    answer = 0
 
     # 각 명령어를 수행한다.
     for d_str in dirs:
@@ -38,27 +36,21 @@ def move(dirs, player, visited):
         ny = y + dy[d]
 
         # 맵 밖으로 나가야 한다면 명령어를 무시한다.
-        if nx < 0 or ny < 0 or nx >= 11 or ny >= 11:
+        if nx < -5 or ny < -5 or nx > 5 or ny > 5:
             continue
 
         # 처음 가보는 길이면 추가한다.
-        if visited[d][nx][ny] == 0:
-            visited[d][nx][ny] = 1
-            cnt += 1
+        if (x, y, nx, ny) not in visited:
+            visited.append((x, y, nx, ny))
+            visited.append((nx, ny, x, y))
+            answer += 1
 
-        x, y = nx, ny
-
-    return cnt
-
-
-def solution(dirs):
-    player = (5, 5)     # 플레이어는 (0, 0)에 있다.
-    visited = [[[0] * 11 for _ in range(11)] for _ in range(4)]     # 총 맵은 -5부터 5까지 있다.
-
-    answer = move(dirs, player, visited)
+        # 이동한다.
+        x = nx
+        y = ny
 
     return answer
 
 
-dirs_ex = "LULLLLLLU"
+dirs_ex = "ULURRDLLU"
 print(solution(dirs_ex))
