@@ -1,28 +1,43 @@
+import sys
+
+
 def check_stats(stats_list, stats):
-	s, e = 0, len(stats_list) - 1
+	low = 0
+	high = len(stats_list)
+	result = 0
 
-	while s <= e:
-		mid = (s+e)//2
+	while low <= high:
+		mid = (low + high) // 2
 
-		if stats_list[mid] <= stats < stats_list[mid+1]:
-			return mid
+		if stats_list[mid] >= stats:
+			result = mid
+			high = mid - 1
+		else:
+			low = mid + 1
 
-
+	return stats_list[result]
 
 
 def solution():
-	char_dic = dict()
-	stats_list = [0]
-	n, m = map(int, input().split())
+	n, m = map(int, sys.stdin.readline().split())
+	style_dic = dict()
+	stats_list = []
 
 	for _ in range(n):
-		word, stats = input().split()
+		style, stats = sys.stdin.readline().split()
 
-		if not char_dic.get(int(stats)):
-			char_dic[int(stats)] = word
-			stats_list.append(int(stats))
+		if style_dic.get(int(stats)):
+			continue
 
+		style_dic[int(stats)] = style
+		stats_list.append(int(stats))
 
+	stats_list.sort()
+
+	for _ in range(m):
+		char_stats = int(sys.stdin.readline().strip())
+		result = check_stats(stats_list, char_stats)
+		print(style_dic[result])
 
 
 solution()
