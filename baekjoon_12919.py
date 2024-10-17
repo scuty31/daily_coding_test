@@ -1,39 +1,41 @@
-def rule_1(s):
-	s += 'A'
-
-	return s
-
-
-def rule_2(s):
-	s += 'B'
-	s = ''.join(list(reversed(list(s))))
-
-	return s
+from collections import deque
 
 
 def check_str(s, t):
-	if s == t:
-		return 1
+	queue = deque()
+	visited = []
+	queue.append(t)
+	visited.append(t)
 
-	if len(s) == len(t):
-		return 0
+	while queue:
+		t = queue.popleft()
 
-	answer_1 = check_str(rule_1(s), t)
-	answer_2 = check_str(rule_2(s), t)
+		if t == s:
+			return 1
 
-	if answer_1 == 1 or answer_2 == 1:
-		print(1)
-		exit()
-	else:
-		return 0
+		if len(t) < len(s):
+			continue
+
+		if t[-1] == 'A':
+			t1 = t[:-1]
+			if t1 not in visited:
+				queue.append(t1)
+
+		if t[0] == 'B':
+			t2 = list(reversed(t[1:]))
+			if t2 not in visited:
+				queue.append(t2)
+
+	return 0
 
 
 def solution():
-	s = input()
-	t = input()
+	s = list(input())
+	t = list(input())
 
 	answer = check_str(s, t)
-	print(answer)
+
+	return answer
 
 
-solution()
+print(solution())
