@@ -1,29 +1,22 @@
 from collections import deque
 
 
-def check(n, maps, sx, sy, s_size):
-    for i in range(n):
-        for j in range(n):
-            if maps[i][j] == 9:
-                continue
-            if maps[i][j] != 0:
-                return True
-
-    return False
-
-
 def move(n, maps, sx, sy, s_size, s_count):
     dx = [-1, 0, 1, 0]
     dy = [0, -1, 0, 1]
 
     q = deque()
-    visited = [[-1] * n for _ in range(n)]
-    visited[sx][sy] = 0
-    q.append((sx, sy))
+    visited = [[False] * n for _ in range(n)]
+    visited[sx][sy] = True
+    q.append((sx, sy, 0))
     answer = list()
+    min_distance = int(1e9)
 
     while q:
-        x, y = q.popleft()
+        x, y, dist = q.popleft()
+
+        if dist > min_distance:
+            continue
 
         for i in range(4):
             nx = x + dx[i]
@@ -31,31 +24,38 @@ def move(n, maps, sx, sy, s_size, s_count):
 
             if nx < 0 or ny < 0 or nx >= n or ny >= n:
                 continue
+            if visited[nx][ny]:
+                continue
             if maps[nx][ny] > s_size:
                 continue
-            if visited[nx][ny] == -1 or visited[nx][ny] > visited[x][y] + 1:
-                visited[nx][ny] = visited[x][y] + 1
-                q.append((nx, ny))
 
-                if maps[nx][ny] != 0 and maps[nx][ny] < s_size:
-                    n_count = s_count + 1
-                    n_size = s_size
+            visited[nx][ny] = True
+            n_dist = dist + 1
 
-                    if n_count == n_size:
-                        n_size += 1
-                        n_count = 0
+            if 0 < maps[nx][ny] < s_size:
+                if n_dist < min_distance:
+                    min_distance = n_dist
+                    answer = [[nx, ny]]
 
-                    answer.append([nx, ny, n_size, n_count, visited[nx][ny]])
+                elif n_dist == min_distance:
+                    answer.append([nx, ny])
 
-    if answer:
-        answer.sort(key=lambda x : (x[-1], x[0], x[1]))
-        result = answer[0]
+            q.append((nx, ny, n_dist))
 
-        maps[result[0]][result[1]] = 0
+    if not answer:
+        return -1, -1, -1, -1, -1
 
-        return answer[0]
+    answer.sort(key=lambda x: (x[0], x[1]))
 
-    return -1, -1, -1, -1, -1
+    sx, sy = answer[0]
+    maps[sx][sy] = 0
+    s_count += 1
+
+    if s_count == s_size:
+        s_size += 1
+        s_count = 0
+
+    return sx, sy, s_size, s_count, min_distance
 
 
 def solution():
@@ -81,7 +81,7 @@ def solution():
         if sx != -1 and sy != -1:
             break
 
-    while check(n, maps, sx, sy, s_size):
+    while True:
         sx, sy, s_size, s_count, time_count = move(n, maps, sx, sy, s_size, s_count)
 
         if sx == -1 and sy == -1:
