@@ -1,30 +1,21 @@
-def check_skill(skill_list, skill_tree):
-    idx = 0
-    visited = dict()
-
-    for s in skill_tree:
-        if s in skill_list:
-            if skill_list[idx] == s:
-                visited[s] = 1
-                idx += 1
-            elif visited.get(s):
-                continue
-            else:
-                return False
-
-    return True
-
-
 def solution(skill, skill_trees):
     answer = 0
-    skill_list = list(skill)
-    skill_tree_list = []
+    skill_dict = {'': 1}
 
-    for i in range(len(skill_trees)):
-        skill_tree_list.append(list(skill_trees[i]))
+    for i in range(len(skill)):
+        skill_dict[skill[:i+1]] = 1
 
-    for i in range(len(skill_trees)):
-        if check_skill(skill_list, skill_tree_list[i]):
+
+    for skill_tree in skill_trees:
+        filtered = []
+
+        for s in skill_tree:
+            if s in skill:
+                filtered.append(s)
+
+        filtered = ''.join(filtered)
+
+        if skill_dict.get(filtered):
             answer += 1
 
     return answer
